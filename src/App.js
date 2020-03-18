@@ -15,7 +15,8 @@ const instance = axios.create({
 class App extends Component {
   state = {
     authors: [],
-    loading: true
+    loading: true,
+    books: []
   };
 
   fetchAllAuthors = async () => {
@@ -23,11 +24,19 @@ class App extends Component {
     return res.data;
   };
 
+  fetchAllBooks = async () => {
+    const response = await axios.get(
+      "https://the-index-api.herokuapp.com/api/books/"
+    );
+    return response.data;
+  };
   async componentDidMount() {
     try {
       const authors = await this.fetchAllAuthors();
+      const books = await this.fetchAllBooks();
       this.setState({
         authors: authors,
+        books: books,
         loading: false
       });
     } catch (err) {
@@ -48,6 +57,10 @@ class App extends Component {
             render={props => (
               <AuthorList {...props} authors={this.state.authors} />
             )}
+          />
+          <Route
+            path="/books/:bookColorID"
+            render={props => <BookList {...props} books={this.state.books} />}
           />
         </Switch>
       );
