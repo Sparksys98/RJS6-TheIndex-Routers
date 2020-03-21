@@ -1,39 +1,37 @@
 import React, { Component } from "react";
-
-// Components
-import AuthorCard from "./AuthorCard";
+import BookTable from "./BookTable";
 import SearchBar from "./SearchBar";
 
-class AuthorList extends Component {
+class BookList extends Component {
   state = {
-    query: "",
-    books: this.props.books
+    filteredBooks: this.props.books
   };
 
-  newBooks = query => {
+  filterBooks = query => {
     query = query.toLowerCase();
-    const newBooks = this.props.books.filter(book => book.title.toLowerCase());
-    this.setState({ query, newBooks });
+    const filteredBooks = this.props.books.filter(book =>
+      book.title.toLowerCase().includes(query)
+    );
+    this.setState({ filteredBooks });
+  };
+  colorfilter = query => {
+    return this.state.filteredBooks.filter(book => book.color === query);
   };
 
   render() {
-    const filteredAuthors = this.props.authors.filter(author =>
-      `${author.first_name} ${author.last_name}`
-        .toLowerCase()
-        .includes(this.state.query)
-    );
-    const authorCards = filteredAuthors.map(author => (
-      <AuthorCard key={author.first_name + author.last_name} author={author} />
-    ));
-
+    let bookCards = this.state.filteredBooks;
+    let urlColor = this.props.match.params.bookColor;
+    if (urlColor) {
+      bookCards = this.colorfilter(urlColor);
+    }
     return (
       <div>
-        <h3>Authors</h3>
-        <SearchBar handleFilter={this.setQuery} />
-        <div className="row">{authorCards}</div>
+        <h3>Books</h3>
+        <SearchBar handleFilter={this.filterBooks} />
+        <BookTable books={bookCards} />
       </div>
     );
   }
 }
 
-export default AuthorList;
+export default BookList;
